@@ -1,0 +1,166 @@
+[
+  {
+    "id": "sanctions",
+    "model": "azure:chat",
+    "runs": 3,
+    "pass_rate": 1.0,
+    "cypher_recall": 1.0,
+    "answer_recall": 1.0,
+    "answer_precision": 1.0,
+    "passed": true,
+    "error": null,
+    "cypher": "MATCH (cp:Counterparty)-[:IS_COMPANY]->(c:Company)\nMATCH path=(c)-[:SUBSIDIARY_OF*0..]->(parent:Company)<-[o:OWNS]-(p:Person)\nWHERE o.pct >= 25\nAND EXISTS {\n  MATCH (:WatchlistEntry)-[:MATCHES]->(p)\n}\nRETURN DISTINCT cp.id AS counterparty, p.id AS person, p.name AS person_name, o.pct AS ownership_pct\nORDER BY cp.id, o.pct DESC LIMIT 100",
+    "per_run": [
+      {
+        "model": "azure:chat",
+        "cypher_recall": 1.0,
+        "answer_recall": 1.0,
+        "answer_precision": 1.0,
+        "passed": true,
+        "error": null,
+        "cypher": "MATCH (cp:Counterparty)-[:IS_COMPANY]->(c:Company)\nMATCH path=(c)-[:SUBSIDIARY_OF*0..]->(parent:Company)<-[o:OWNS]-(p:Person)\nWHERE o.pct >= 25\nAND EXISTS {\n  MATCH (:WatchlistEntry)-[:MATCHES]->(p)\n}\nRETURN DISTINCT cp.id AS counterparty, p.id AS person, p.name AS person_name, o.pct AS ownership_pct\nORDER BY cp.id, o.pct DESC LIMIT 100"
+      },
+      {
+        "model": "azure:chat",
+        "cypher_recall": 1.0,
+        "answer_recall": 1.0,
+        "answer_precision": 1.0,
+        "passed": true,
+        "error": null,
+        "cypher": "MATCH (cp:Counterparty)-[:IS_COMPANY]->(c:Company)\nMATCH path=(c)-[:SUBSIDIARY_OF*0..]->(parent:Company)<-[o:OWNS]-(p:Person)\nMATCH (w:WatchlistEntry)-[:MATCHES]->(p)\nWHERE o.pct >= 25\nRETURN DISTINCT cp.id AS counterparty, p.id AS person, p.name AS person_name, o.pct AS ownership_pct LIMIT 100"
+      },
+      {
+        "model": "azure:chat",
+        "cypher_recall": 1.0,
+        "answer_recall": 1.0,
+        "answer_precision": 1.0,
+        "passed": true,
+        "error": null,
+        "cypher": "MATCH (cp:Counterparty)-[:IS_COMPANY]->(c:Company)\nMATCH path=(c)-[:SUBSIDIARY_OF*0..]->(parent:Company)<-[o:OWNS]-(p:Person)\nWHERE o.pct >= 25\nAND EXISTS {\n  MATCH (:WatchlistEntry)-[:MATCHES]->(p)\n}\nRETURN DISTINCT cp.id AS counterparty, p.id AS person, p.name AS person_name, o.pct AS ownership_pct\nORDER BY cp.id, o.pct DESC LIMIT 100"
+      }
+    ]
+  },
+  {
+    "id": "downgrades",
+    "model": "azure:chat",
+    "runs": 3,
+    "pass_rate": 1.0,
+    "cypher_recall": 1.0,
+    "answer_recall": 1.0,
+    "answer_precision": 1.0,
+    "passed": true,
+    "error": null,
+    "cypher": "MATCH (cp:Counterparty)-[:HAS_RATING]->(r1:CreditRating)\nWITH cp, r1\nORDER BY r1.rated_on DESC\nWITH cp, collect(r1) AS ratings\nWHERE size(ratings) >= 2\nWITH cp, ratings[0] AS latest, ratings[1] AS previous\nWHERE latest.investment_grade = false AND latest.rating_rank > previous.rating_rank AND latest.rated_on >= '2026-07-20'\nRETURN cp.id AS counterparty, latest.agency AS agency, latest.rating AS current_rating, latest.rated_on AS rated_on, previous.rating AS previous_rating, previous.rated_on AS previous_rated_on\nORDER BY latest.rated_on DESC LIMIT 100",
+    "per_run": [
+      {
+        "model": "azure:chat",
+        "cypher_recall": 1.0,
+        "answer_recall": 1.0,
+        "answer_precision": 1.0,
+        "passed": true,
+        "error": null,
+        "cypher": "MATCH (cp:Counterparty)-[:HAS_RATING]->(cr:CreditRating)\nWITH cp, cr\nORDER BY cr.rated_on DESC\nWITH cp, collect(cr) AS ratings\nWHERE size(ratings) >= 2\nWITH cp, ratings[0] AS latest, ratings[1] AS previous\nWHERE latest.investment_grade = false AND latest.rating_rank > previous.rating_rank AND latest.rated_on >= '2026-07-20'\nRETURN cp.id AS counterparty, latest.agency AS agency, latest.rating AS current_rating, latest.rated_on AS rated_on, previous.rating AS previous_rating, previous.rated_on AS previous_rated_on\nORDER BY latest.rated_on DESC LIMIT 100"
+      },
+      {
+        "model": "azure:chat",
+        "cypher_recall": 1.0,
+        "answer_recall": 1.0,
+        "answer_precision": 1.0,
+        "passed": true,
+        "error": null,
+        "cypher": "MATCH (cp:Counterparty)-[:HAS_RATING]->(cr:CreditRating)\nWITH cp, cr\nORDER BY cr.rated_on DESC\nWITH cp, collect(cr) AS ratings\nWHERE size(ratings) >= 2\nWITH cp, ratings[0] AS latest, ratings[1] AS previous\nWHERE latest.investment_grade = false AND latest.rating_rank > previous.rating_rank AND latest.rated_on >= '2026-07-20'\nRETURN cp.id AS counterparty, latest.agency AS agency, latest.rating AS current_rating, latest.rated_on AS rated_on, previous.rating AS previous_rating, previous.rated_on AS previous_rated_on\nORDER BY latest.rated_on DESC LIMIT 100"
+      },
+      {
+        "model": "azure:chat",
+        "cypher_recall": 1.0,
+        "answer_recall": 1.0,
+        "answer_precision": 1.0,
+        "passed": true,
+        "error": null,
+        "cypher": "MATCH (cp:Counterparty)-[:HAS_RATING]->(r1:CreditRating)\nWITH cp, r1\nORDER BY r1.rated_on DESC\nWITH cp, collect(r1) AS ratings\nWHERE size(ratings) >= 2\nWITH cp, ratings[0] AS latest, ratings[1] AS previous\nWHERE latest.investment_grade = false AND latest.rating_rank > previous.rating_rank AND latest.rated_on >= '2026-07-20'\nRETURN cp.id AS counterparty, latest.agency AS agency, latest.rating AS current_rating, latest.rated_on AS rated_on, previous.rating AS previous_rating, previous.rated_on AS previous_rated_on\nORDER BY latest.rated_on DESC LIMIT 100"
+      }
+    ]
+  },
+  {
+    "id": "limits",
+    "model": "azure:chat",
+    "runs": 3,
+    "pass_rate": 1.0,
+    "cypher_recall": 1.0,
+    "answer_recall": 1.0,
+    "answer_precision": 1.0,
+    "passed": true,
+    "error": null,
+    "cypher": "MATCH (cp:Counterparty)-[:HAS_LIMIT]->(cl:CreditLimit)\nOPTIONAL MATCH (t:Trade {status: 'open'})-[:WITH]->(cp)\nWITH cp, cl, coalesce(sum(t.mtm_eur), 0) AS exposure_raw\nWITH cp, cl, CASE WHEN exposure_raw > 0 THEN exposure_raw ELSE 0 END AS exposure\nWHERE exposure > cl.limit_eur\nRETURN cp.id AS counterparty, exposure, cl.limit_eur AS credit_limit\nORDER BY exposure DESC LIMIT 100",
+    "per_run": [
+      {
+        "model": "azure:chat",
+        "cypher_recall": 1.0,
+        "answer_recall": 1.0,
+        "answer_precision": 1.0,
+        "passed": true,
+        "error": null,
+        "cypher": "MATCH (cp:Counterparty)-[:HAS_LIMIT]->(cl:CreditLimit)\nOPTIONAL MATCH (t:Trade {status: 'open'})-[:WITH]->(cp)\nWITH cp, cl, coalesce(sum(t.mtm_eur), 0) AS exposure\nWHERE exposure > cl.limit_eur AND exposure > 0\nRETURN cp.id AS counterparty, exposure, cl.limit_eur AS credit_limit\nORDER BY exposure DESC LIMIT 100"
+      },
+      {
+        "model": "azure:chat",
+        "cypher_recall": 1.0,
+        "answer_recall": 1.0,
+        "answer_precision": 1.0,
+        "passed": true,
+        "error": null,
+        "cypher": "MATCH (cp:Counterparty)-[:HAS_LIMIT]->(cl:CreditLimit)\nOPTIONAL MATCH (t:Trade {status: 'open'})-[:WITH]->(cp)\nWITH cp, cl, coalesce(sum(t.mtm_eur), 0) AS exposure\nWHERE exposure > cl.limit_eur AND exposure > 0\nRETURN cp.id AS counterparty, exposure, cl.limit_eur AS credit_limit\nORDER BY exposure DESC LIMIT 100"
+      },
+      {
+        "model": "azure:chat",
+        "cypher_recall": 1.0,
+        "answer_recall": 1.0,
+        "answer_precision": 1.0,
+        "passed": true,
+        "error": null,
+        "cypher": "MATCH (cp:Counterparty)-[:HAS_LIMIT]->(cl:CreditLimit)\nOPTIONAL MATCH (t:Trade {status: 'open'})-[:WITH]->(cp)\nWITH cp, cl, coalesce(sum(t.mtm_eur), 0) AS exposure_raw\nWITH cp, cl, CASE WHEN exposure_raw > 0 THEN exposure_raw ELSE 0 END AS exposure\nWHERE exposure > cl.limit_eur\nRETURN cp.id AS counterparty, exposure, cl.limit_eur AS credit_limit\nORDER BY exposure DESC LIMIT 100"
+      }
+    ]
+  },
+  {
+    "id": "concentration",
+    "model": "azure:chat",
+    "runs": 3,
+    "pass_rate": 1.0,
+    "cypher_recall": 1.0,
+    "answer_recall": 1.0,
+    "answer_precision": 1.0,
+    "passed": true,
+    "error": null,
+    "cypher": "MATCH (t:Trade)-[:WITH]->(cp:Counterparty)\nWITH cp, sum(t.notional_eur) AS cp_notional\nMATCH (t2:Trade)\nWITH cp, cp_notional, sum(t2.notional_eur) AS total_notional\nRETURN cp.id AS counterparty, cp.name AS name, cp_notional / total_notional AS share_of_notional\nORDER BY share_of_notional DESC\nLIMIT 1",
+    "per_run": [
+      {
+        "model": "azure:chat",
+        "cypher_recall": 1.0,
+        "answer_recall": 1.0,
+        "answer_precision": 1.0,
+        "passed": true,
+        "error": null,
+        "cypher": "MATCH (t:Trade)-[:WITH]->(cp:Counterparty)\nWITH cp, sum(t.notional_eur) AS cp_notional\nMATCH (t2:Trade)\nWITH cp, cp_notional, sum(t2.notional_eur) AS total_notional\nRETURN cp.id AS counterparty, cp.name AS name, cp_notional / total_notional AS share_of_notional\nORDER BY share_of_notional DESC\nLIMIT 1"
+      },
+      {
+        "model": "azure:chat",
+        "cypher_recall": 1.0,
+        "answer_recall": 1.0,
+        "answer_precision": 1.0,
+        "passed": true,
+        "error": null,
+        "cypher": "MATCH (t:Trade)-[:WITH]->(cp:Counterparty)\nWITH cp, sum(t.notional_eur) AS cp_notional\nMATCH (t2:Trade)\nWITH cp, cp_notional, sum(t2.notional_eur) AS total_notional\nRETURN cp.id AS counterparty, cp.name AS name, cp_notional / total_notional AS share_of_notional\nORDER BY share_of_notional DESC\nLIMIT 1"
+      },
+      {
+        "model": "azure:chat",
+        "cypher_recall": 1.0,
+        "answer_recall": 1.0,
+        "answer_precision": 1.0,
+        "passed": true,
+        "error": null,
+        "cypher": "MATCH (t:Trade)-[:WITH]->(cp:Counterparty)\nWITH cp, sum(t.notional_eur) AS cp_notional\nMATCH (t2:Trade)\nWITH cp, cp_notional, sum(t2.notional_eur) AS total_notional\nRETURN cp.id AS counterparty, cp.name AS name, cp_notional / total_notional AS share_of_notional\nORDER BY share_of_notional DESC\nLIMIT 1"
+      }
+    ]
+  }
+]

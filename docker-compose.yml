@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: etg
+      POSTGRES_PASSWORD: etg
+      POSTGRES_DB: etg
+    ports: ["5433:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+  neo4j:
+    image: neo4j:5-community
+    environment:
+      NEO4J_AUTH: neo4j/etgpassword
+    ports: ["7474:7474", "7687:7687"]
+    volumes: ["neodata:/data"]
+volumes:
+  pgdata:
+  neodata:

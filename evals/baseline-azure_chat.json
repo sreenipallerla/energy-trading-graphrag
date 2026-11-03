@@ -1,0 +1,42 @@
+[
+  {
+    "id": "sanctions",
+    "model": "azure:chat",
+    "cypher_recall": 0.0,
+    "answer_recall": 0.0,
+    "answer_precision": 0.0,
+    "passed": false,
+    "error": "database error: {neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Aggregation column contains implicit grouping expressions. For example, in 'RETURN n.a, n.a + n.b + count(*)' the aggregation expression 'n.a + n.b + count(*)' includes the implicit grouping key 'n.b'. It may be possible to rewrite the qu",
+    "cypher": "MATCH (cp:Counterparty)-[:IS_COMPANY]->(c:Company)\nOPTIONAL MATCH path = (c)<-[:SUBSIDIARY_OF*0..]-(parent:Company)\nWITH cp, collect(DISTINCT parent) + c AS companies\nUNWIND companies AS comp\nMATCH (p:Person)-[o:OWNS]->(comp)\nWHERE o.pct >= 25\nMATCH (:WatchlistEntry)-[:MATCHES]->(p)\nRETURN DISTINCT cp.id AS counterparty, cp.name AS counterparty_name\nORDER BY cp.id"
+  },
+  {
+    "id": "downgrades",
+    "model": "azure:chat",
+    "cypher_recall": 1.0,
+    "answer_recall": 1.0,
+    "answer_precision": 1.0,
+    "passed": true,
+    "error": null,
+    "cypher": "MATCH (cp:Counterparty)-[:HAS_RATING]->(cr:CreditRating)\nWITH cp, cr\nORDER BY cr.rated_on DESC\nWITH cp, collect(cr) AS ratings\nWITH cp, ratings[0] AS currentRating, ratings[1] AS previousRating\nWHERE currentRating.rating IN ['BB+', 'BB', 'BB-', 'B+', 'B', 'CCC']\n  AND currentRating.rated_on >= '2026-07-20'\n  AND previousRating IS NOT NULL\n  AND previousRating.rating > currentRating.rating\nRETURN cp.id AS counterparty, currentRating.rating AS current_rating, currentRating.rated_on AS rated_on\nORDER BY currentRating.rated_on DESC LIMIT 100"
+  },
+  {
+    "id": "limits",
+    "model": "azure:chat",
+    "cypher_recall": 1.0,
+    "answer_recall": 1.0,
+    "answer_precision": 1.0,
+    "passed": true,
+    "error": null,
+    "cypher": "MATCH (cp:Counterparty)-[:HAS_LIMIT]->(cl:CreditLimit)\nOPTIONAL MATCH (t:Trade {status: 'open'})-[:WITH]->(cp)\nWITH cp, cl, sum(t.mtm_eur) AS total_mtm\nWITH cp, cl, CASE WHEN total_mtm > 0 THEN total_mtm ELSE 0 END AS exposure, cl.limit_eur AS limit\nWHERE exposure > limit\nRETURN cp.id AS counterparty, exposure, limit\nORDER BY exposure DESC LIMIT 100"
+  },
+  {
+    "id": "concentration",
+    "model": "azure:chat",
+    "cypher_recall": 1.0,
+    "answer_recall": 1.0,
+    "answer_precision": 1.0,
+    "passed": true,
+    "error": null,
+    "cypher": "MATCH (t:Trade)-[:WITH]->(cp:Counterparty)\nWITH cp, sum(t.notional_eur) AS cp_notional\nWITH sum(cp_notional) AS total_notional, collect({cp: cp, cp_notional: cp_notional}) AS cp_data\nUNWIND cp_data AS data\nWITH data.cp AS cp, data.cp_notional AS cp_notional, total_notional\nRETURN cp.id AS counterparty, cp.name AS name, cp_notional / total_notional AS share_of_notional\nORDER BY share_of_notional DESC\nLIMIT 1"
+  }
+]

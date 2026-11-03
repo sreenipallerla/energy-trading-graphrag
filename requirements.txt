@@ -1,0 +1,7 @@
+psycopg[binary]>=3.2
+neo4j>=5.20
+httpx>=0.27
+pytest>=8
+# Azure provider (Gate 3), only needed with LLM_PROVIDER=azure:
+# openai>=1.40
+# azure-identity>=1.17
